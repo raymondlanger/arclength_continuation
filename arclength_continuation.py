@@ -62,7 +62,7 @@ r_tol = 1.0e-08
 assert (r_tol > 0.0)
 assert (r_tol < 0.5)
 
-# The maximum number of iterations before the method is considered to have
+# The maximum number of iterations before newton's method is considered to have
 # diverged.
 max_iter = 20
 assert (max_iter > 0)
