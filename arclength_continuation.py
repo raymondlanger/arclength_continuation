@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# This program numerically computes points on the unit circle in a newton method
-# embedded within a pseudo-arclength continuation [1]. The continuation proceeds
-# through points where the derivative of the solved function is singular. For
-# example, the unit circle,
+# This program numerically computes points on the unit circle using Newton's
+# method embedded within a pseudo-arclength continuation [1]. The continuation
+# proceeds through points where the derivative of the solved function is
+# singular. The unit circle,
 #
 #    G(y,x) = y^2 + x^2 - 1 = 0,
 #
@@ -57,18 +57,19 @@ assert (abs(delta_s) != 0.0)
 n_continuation = 30
 assert (n_continuation > 0)
 
-# The relative tolerance that determines what's considered a converged solution.
-r_tol = 1.0e-08
-assert (r_tol > 0.0)
-assert (r_tol < 0.5)
+# If the 2-norm of the newton step vector is smaller than
+# the tolerance "tol" the solution is considered converged.
+tol = 1.0e-08
+assert (tol > 0.0)
+assert (tol < 0.5)
 
-# The maximum number of iterations before newton's method is considered to have
+# The maximum number of iterations before Newton's method is considered to have
 # diverged.
 max_iter = 20
 assert (max_iter > 0)
 assert (max_iter < 1000)
 
-# The starting values must be sufficiently close to the circle.
+# The starting values:
 #T = -0.99996666
 #a = -0.00816578
 
@@ -84,8 +85,9 @@ light_blue = "#72a0c1"
 converged_color = light_blue
 diverged_color = "red"
 
-# Use a predictor step that improve the initial guess of every step
-# with only one extra backsubstitution
+# Use a predictor step that improves the initial guess of every
+# continuation step with only one extra solve step (usually a back
+# substitution, but here the 2x2 matrix is inverted analytically)
 predictor = True
 
 ##
@@ -151,9 +153,9 @@ a_init = a
 n_iter = 0
 
 #
-# Execute newton's method to find the first solution.
+# Execute Newton's method to find the first solution.
 #
-while (np.linalg.norm(G(T, a)) > r_tol and max_iter > n_iter):
+while (np.linalg.norm(G(T, a)) > tol and max_iter > n_iter):
   n_iter += 1
   if (abs(T) < 1.0e-10):
     print("Invalid inital guess: T_init =", T_init, " a = ", a_init,
@@ -164,7 +166,7 @@ while (np.linalg.norm(G(T, a)) > r_tol and max_iter > n_iter):
 
 # Check whether the initial point is sufficiently close to the circle.
 res = np.linalg.norm(G(T, a))
-if (res < r_tol):
+if (res < tol):
   print(
       "First converged solution: |G(T = " + "{:.2f}".format(T) + ", a = " +
       "{:.2f}".format(a) + ")| =", "{:.2e}".format(res))
@@ -212,15 +214,15 @@ axes.add_patch(
 #
 sp = np.copy(s)
 for c in range(n_continuation):
-  # initialize the newton iteration
+  # initialize the Newton iteration
   n_iter = 0
   # defining Ai here is only required to extent the scope
   # the variable Ai to the predictor step below
   Ai = [[0.0, 0.0], [0.0, 0.0]]
-  # test_stop > r_tol such that at least one iteration is executed
-  test_stop = 10.0 * r_tol
-  # newton's method
-  while (np.linalg.norm(test_stop) > r_tol and n_iter < max_iter):
+  # test_stop > tol such that at least one iteration is executed
+  test_stop = 10.0 * tol
+  # Newton's method
+  while (np.linalg.norm(test_stop) > tol and n_iter < max_iter):
     n_iter += 1
     Ai = Ainv(s[0], s[1], sp[0], sp[1])
     rhs = np.array([G(s[0], s[1]), N(s[0], s[1], sp[0], sp[1], delta_s)])
@@ -229,7 +231,7 @@ for c in range(n_continuation):
     test_stop = np.linalg.norm(step)
 
   # summarize what happened
-  if (np.linalg.norm(test_stop) < r_tol):
+  if (np.linalg.norm(test_stop) < tol):
     print("step " + "{:4d}".format(c + 1) + ": It =" + "{:2d}".format(n_iter) +
           "     |step| = " + "{:.2e}".format(np.linalg.norm(step)) +
           "     |G| = " + "{:.2e}".format(np.linalg.norm(G(s[0], s[1]))) +
@@ -258,7 +260,7 @@ for c in range(n_continuation):
                  label="diverged solution")
     # Not expected.
     # Stop here because the solution is crap now.
-    # It is unclear why newton's method failed.
+    # It is unclear why Newton's method failed.
     break
 
 plt.grid()
