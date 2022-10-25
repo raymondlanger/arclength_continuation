@@ -174,7 +174,7 @@ else:
   print("Initial guess (T_init = " + "{:.2f}".format(T_init) + ", a = " +
         "{:.2f}".format(a_init) + ") diverged: |G(T = " + "{:.2f}".format(T) +
         ", a = " + "{:.2f}".format(a) + ")| = " + "{:.4f}".format(res) +
-        ". Try a better initial guess.")
+        ". This is unexpected.")
   quit()
 
 # Highlight the first converged solution with a bold cross
@@ -216,7 +216,7 @@ sp = np.copy(s)
 for c in range(n_continuation):
   # initialize the Newton iteration
   n_iter = 0
-  # defining Ai here is only required to extent the scope
+  # defining Ai here is only required to extent the scope of
   # the variable Ai to the predictor step below
   Ai = [[0.0, 0.0], [0.0, 0.0]]
   # test_stop > tol such that at least one iteration is executed
