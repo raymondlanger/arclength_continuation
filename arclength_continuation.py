@@ -84,6 +84,10 @@ light_blue = "#72a0c1"
 converged_color = light_blue
 diverged_color = "red"
 
+# Use a predictor step that improve the initial guess of every step
+# with only one extra backsubstitution
+predictor = True
+
 ##
 ## Input end
 ##
@@ -206,10 +210,13 @@ axes.add_patch(
 #
 # Start the pseudo-arclength continuation
 #
+sp = np.copy(s)
 for c in range(n_continuation):
-  sp = np.copy(s)
   # initialize the newton iteration
   n_iter = 0
+  # defining Ai here is only required to extent the scope
+  # the variable Ai to the predictor step below
+  Ai = [[0.0, 0.0], [0.0, 0.0]]
   # test_stop > r_tol such that at least one iteration is executed
   test_stop = 10.0 * r_tol
   # newton's method
@@ -229,6 +236,11 @@ for c in range(n_continuation):
           " (successful)")
     T_history.append(s[0])
     a_history.append(s[1])
+    sp = np.copy(s)
+    if (predictor):
+      predictor_step = np.matmul(Ai, np.array([0.0, 1.0]))
+      predictor_step = predictor_step / np.linalg.norm(predictor_step)
+      s = np.add(s, predictor_step * delta_s)
     if (n_continuation == c + 1):
       print("All " + str(n_continuation) + " steps were successful.")
   else:
