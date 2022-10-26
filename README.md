@@ -1,4 +1,4 @@
-# An example of the pseudo-arclength continuation method
+# An example application of the pseudo-arclength continuation method
 
 The documentation is in the source code file. Use the 
 following command to run the continuation:
