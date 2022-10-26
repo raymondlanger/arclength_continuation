@@ -102,16 +102,26 @@ axes.scatter(a, T, marker='o', color=converged_color, label='Initial guess')
 
 
 # p means (p)revious
+
+# See def A() for an explanation
 def Ainv(T, a, Tp, ap):
   det = 2.0 * (T * Tp + a * ap)
   return 1.0 / det * np.array([[Tp, -2.0 * a], [ap, 2.0 * T]])
 
-
-# not used; This is only for documentation and testing purposes
+# A is the Jacobian of the system 
+# H = (G, N)^T = 0 (^T means transposed)
+#
+# A = d H / d(x,y)
+# 
+# x and y (a and T in the source code) are both considered to be  
+# functions of the curve parameter.
+#
+# A is not used; This is only for documentation and testing purposes
 def A(T, a, Tp, ap):
   return np.array([[2.0 * T, 2.0 * a], [-ap, Tp]])
 
 
+# The nonlinear equation G = 0 to be solved.
 def G(T, a):
   return T * T + a * a - 1.0
 
@@ -124,6 +134,15 @@ def Tangent(solution):
   return np.array([T, -a])
 
 
+# The solution is advanced from sp to s along the solution curve in the unit 
+# tangent t=t(s0) direction. The normalization condition N = 0 constrains the 
+# arclength between sp and s. In other words, the normalization condition must 
+# be satisfied to achieve the desired step size. However, it is not required 
+# to constrain the exact arclength. Instead, it suffices to constrain an 
+# approximation of the arclength, hence the term pseudo-arclength. Here, we 
+# project the vector (s-sp) onto the tangent t and constrain the projection 
+# vector's length to delta_s: 
+# N = t^T * (s-sp) - delta_s = 0 (^T means transposed, so it is a dot product)
 def N(T, a, Tp, ap, ds):
   tan = Tangent(np.array([Tp, ap]))
   tan_in_A_direction = tan[0]
