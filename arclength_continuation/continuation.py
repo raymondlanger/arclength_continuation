@@ -1,22 +1,3 @@
-#!/usr/bin/env python
-
-# This program numerically computes points on the unit circle using Newton's
-# method embedded within a pseudo-arclength continuation [1]. The continuation
-# proceeds through points where the derivative of the solved function is
-# singular. The unit circle,
-#
-#    G(y,x) = y^2 + x^2 - 1 = 0,
-#
-# has such points at y = 0, where x is considered a parameter. In contrast to the
-# pseudo-arclength continuation, Newton's method would fail at these points in a
-# natural parameter continuation. No solution exists for |x| > 1.0, and attempts
-# to find a solution for such values of x would also result in converge failures
-# in natural continuations.
-
-# [1] Keller, H.B., Numerical solution of bifurcation and nonlinear eigenvalue
-#     problems) in Applications of Bifurcation Theory (P. Rabinowitz, ed.)
-#     Academic Press, New York (1977) 359-384.
-
 # MIT License
 #
 # Copyright (c) 2025 Raymond Langer
@@ -39,7 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from dataclasses import dataclass
+# This module implements the routines to numerically computes points on the 
+# unit circle using Newton's method embedded within a pseudo-arclength 
+# continuation [1]. The continuation proceeds through points where the 
+# derivative of the solved function is singular. The unit circle,
+#
+#    G(y,x) = y^2 + x^2 - 1 = 0,
+#
+# has such points at y = 0, where x is considered a parameter. In contrast to the
+# pseudo-arclength continuation, Newton's method would fail at these points in a
+# natural parameter continuation. No solution exists for |x| > 1.0, and attempts
+# to find a solution for such values of x would also result in converge failures
+# in natural continuations.
+
+# [1] Keller, H.B., Numerical solution of bifurcation and nonlinear eigenvalue
+#     problems) in Applications of Bifurcation Theory (P. Rabinowitz, ed.)
+#     Academic Press, New York (1977) 359-384.
+
+
 from typing import List, Tuple
 import numpy as np
 from numpy.typing import NDArray
@@ -48,7 +46,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-import argparse
+from .args import parse_args
+from .parameters import ContinuationParameters
 
 COLORS = {
     "reference": "gray",
@@ -56,24 +55,6 @@ COLORS = {
     "converged": "#72a0c1",
     "diverged": "red"
 }
-
-
-@dataclass
-class ContinuationParameters:
-  delta_s: float
-  n_continuation: int
-  tol: float
-  max_iter: int
-  predictor: bool
-
-  def __str__(self) -> str:
-    return ("ContinuationParameters:\n"
-            f"  delta_s        = {self.delta_s}\n"
-            f"  n_continuation = {self.n_continuation}\n"
-            f"  tol            = {self.tol}\n"
-            f"  max_iter       = {self.max_iter}\n"
-            f"  predictor      = {self.predictor}")
-
 
 # See def A() for an explanation
 def Ainv(y: float, x: float, yp: float, xp: float) -> NDArray[np.float64]:
@@ -161,64 +142,6 @@ assert (abs(N(-y_t, x_t, y_t, x_t, 0.059972993922)) < 1.0e-06)
 ##
 ## Tests end
 ##
-
-
-def parse_args():
-  parser = argparse.ArgumentParser(
-      description="Pseudo-arclength solution of a unit circle.")
-  parser.add_argument(
-      "--delta_s",
-      "-d",
-      type=float,
-      default=0.2,
-      help=
-      "Step size of the continuation (negative -> counterclockwise, positive -> clockwise)."
-  )
-  parser.add_argument("--n_continuation",
-                      "-n",
-                      type=int,
-                      default=30,
-                      help="Number of continuation steps.")
-  parser.add_argument("--tol",
-                      "-t",
-                      type=float,
-                      default=1.0e-08,
-                      help="Newton convergence tolerance.")
-  parser.add_argument(
-      "--max_iter",
-      "-m",
-      type=int,
-      default=20,
-      help="Maximum Newton iterations before divergence is declared.")
-  parser.add_argument("--y",
-                      "-y",
-                      type=float,
-                      default=0.6,
-                      help="Initial guess for y (y-coordinate).")
-  parser.add_argument("--x",
-                      "-x",
-                      type=float,
-                      default=0.6,
-                      help="Initial guess for x (x-coordinate).")
-
-  # Here we add predictor with a default of True, but allow disabling it
-  group = parser.add_mutually_exclusive_group()
-  group.add_argument(
-      "--predictor",
-      "-p",
-      dest="predictor",
-      action="store_true",
-      default=True,
-      help=
-      "Use a predictor step that improves the initial guess of every continuation step with only one extra solve step (usually a back substitution, but here the 2x2 matrix is inverted analytically)."
-  )
-  group.add_argument("--no-predictor",
-                     dest="predictor",
-                     action="store_false",
-                     help="Disable the predictor step.")
-
-  return parser.parse_args()
-
 
 def compute_first_solution(
     x: float, y: float,
@@ -348,6 +271,9 @@ def pseudo_arclength_continuation(
 
 
 def plot_solutions(solutions: List[Tuple[float, float]]):
+  """
+  Plot all solutions from the continuation steps, if any.
+  """
   if not solutions:
     # no solutions found
     return
@@ -362,16 +288,15 @@ def plot_solutions(solutions: List[Tuple[float, float]]):
   plt.legend(loc='center')
 
 
-def main():
+def run(params: ContinuationParameters, x: float, y: float):
+  # args = parse_args()
 
-  args = parse_args()
-
-  # Construct the dataclass from parsed arguments
-  params = ContinuationParameters(delta_s=args.delta_s,
-                                  n_continuation=args.n_continuation,
-                                  tol=args.tol,
-                                  max_iter=args.max_iter,
-                                  predictor=args.predictor)
+  # # Construct the dataclass from parsed arguments
+  # params = ContinuationParameters(delta_s=args.delta_s,
+  #                                 n_continuation=args.n_continuation,
+  #                                 tol=args.tol,
+  #                                 max_iter=args.max_iter,
+  #                                 predictor=args.predictor)
 
   # Validate arguments if needed (like your original asserts)
   if not (abs(params.delta_s) < 1.0 and abs(params.delta_s) != 0.0):
@@ -382,17 +307,14 @@ def main():
     raise ValueError("tol must lie between 0.0 and 0.5.")
   if not (0 < params.max_iter < 1000):
     raise ValueError("max_iter must lie between 1 and 999.")
-  if not (abs(args.y) <= 1.1):
+  if not (abs(y) <= 1.1):
     raise ValueError("|y| must be <= 1.1.")
-  if not (abs(args.x) <= 1.0):
+  if not (abs(x) <= 1.0):
     raise ValueError("|x| must be <= 1.0.")
 
   print(params)
-  print(f"Initial guess y = {args.y}")
-  print(f"Initial guess x = {args.x}\n")
-
-  y = args.y
-  x = args.x
+  print(f"Initial guess y = {y}")
+  print(f"Initial guess x = {x}\n")
 
   x, y, res = compute_first_solution(x, y, params)
   if (res < params.tol):
@@ -400,11 +322,10 @@ def main():
         "First converged solution: |G(y = " + "{:.2f}".format(y) + ", x = " +
         "{:.2f}".format(x) + ")| =", "{:.2e}".format(res))
   else:
-    print("Initial guess (y_init = " + "{:.2f}".format(args.y) + ", x = " +
+    raise RuntimeError("Initial guess (y_init = " + "{:.2f}".format(args.y) + ", x = " +
           "{:.2f}".format(args.x) + ") diverged: |G(y = " +
           "{:.2f}".format(y) + ", x = " + "{:.2f}".format(x) + ")| = " +
           "{:.4f}".format(res) + ". This is unexpected.")
-    quit()
 
   ax, fig = plot_first_solution(x, y, params.delta_s)
 
@@ -432,6 +353,3 @@ def main():
 
   plt.show()
 
-
-if __name__ == "__main__":
-  main()
