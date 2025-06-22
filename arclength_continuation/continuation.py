@@ -20,9 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This module implements the routines to numerically computes points on the 
-# unit circle using Newton's method embedded within a pseudo-arclength 
-# continuation [1]. The continuation proceeds through points where the 
+# This module implements the routines to numerically computes points on the
+# unit circle using Newton's method embedded within a pseudo-arclength
+# continuation [1]. The continuation proceeds through points where the
 # derivative of the solved function is singular. The unit circle,
 #
 #    G(y,x) = y^2 + x^2 - 1 = 0,
@@ -37,7 +37,6 @@
 #     problems) in Applications of Bifurcation Theory (P. Rabinowitz, ed.)
 #     Academic Press, New York (1977) 359-384.
 
-
 from typing import List, Tuple
 import numpy as np
 from numpy.typing import NDArray
@@ -46,8 +45,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .args import parse_args
-from .parameters import ContinuationParameters
+from arclength_continuation.args import parse_args
+from arclength_continuation.parameters import ContinuationParameters
 
 COLORS = {
     "reference": "gray",
@@ -55,6 +54,7 @@ COLORS = {
     "converged": "#72a0c1",
     "diverged": "red"
 }
+
 
 # See def A() for an explanation
 def Ainv(y: float, x: float, yp: float, xp: float) -> NDArray[np.float64]:
@@ -142,6 +142,7 @@ assert (abs(N(-y_t, x_t, y_t, x_t, 0.059972993922)) < 1.0e-06)
 ##
 ## Tests end
 ##
+
 
 def compute_first_solution(
     x: float, y: float,
@@ -289,14 +290,6 @@ def plot_solutions(solutions: List[Tuple[float, float]]):
 
 
 def run(params: ContinuationParameters, x: float, y: float):
-  # args = parse_args()
-
-  # # Construct the dataclass from parsed arguments
-  # params = ContinuationParameters(delta_s=args.delta_s,
-  #                                 n_continuation=args.n_continuation,
-  #                                 tol=args.tol,
-  #                                 max_iter=args.max_iter,
-  #                                 predictor=args.predictor)
 
   # Validate arguments if needed (like your original asserts)
   if not (abs(params.delta_s) < 1.0 and abs(params.delta_s) != 0.0):
@@ -322,10 +315,11 @@ def run(params: ContinuationParameters, x: float, y: float):
         "First converged solution: |G(y = " + "{:.2f}".format(y) + ", x = " +
         "{:.2f}".format(x) + ")| =", "{:.2e}".format(res))
   else:
-    raise RuntimeError("Initial guess (y_init = " + "{:.2f}".format(args.y) + ", x = " +
-          "{:.2f}".format(args.x) + ") diverged: |G(y = " +
-          "{:.2f}".format(y) + ", x = " + "{:.2f}".format(x) + ")| = " +
-          "{:.4f}".format(res) + ". This is unexpected.")
+    raise RuntimeError("Initial guess (y_init = " + "{:.2f}".format(args.y) +
+                       ", x = " + "{:.2f}".format(args.x) +
+                       ") diverged: |G(y = " + "{:.2f}".format(y) + ", x = " +
+                       "{:.2f}".format(x) + ")| = " + "{:.4f}".format(res) +
+                       ". This is unexpected.")
 
   ax, fig = plot_first_solution(x, y, params.delta_s)
 
@@ -352,4 +346,3 @@ def run(params: ContinuationParameters, x: float, y: float):
   plot_solutions(solutions)
 
   plt.show()
-

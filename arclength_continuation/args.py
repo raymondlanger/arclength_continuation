@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 import argparse
+from arclength_continuation.parameters import DEFAULTS
+
 
 def parse_args():
   """
@@ -31,52 +33,61 @@ def parse_args():
   """
   parser = argparse.ArgumentParser(
       description="Pseudo-arclength solution of a unit circle.")
+
+  # Use defaults from parameters.DEFAULTS
   parser.add_argument(
       "--delta_s",
       "-d",
       type=float,
-      default=0.2,
+      default=DEFAULTS["delta_s"],
       help=
       "Step size of the continuation (negative -> counterclockwise, positive -> clockwise)."
   )
+
   parser.add_argument("--n_continuation",
                       "-n",
                       type=int,
-                      default=30,
+                      default=DEFAULTS["n_continuation"],
                       help="Number of continuation steps.")
+
   parser.add_argument("--tol",
                       "-t",
                       type=float,
-                      default=1.0e-08,
+                      default=DEFAULTS["tol"],
                       help="Newton convergence tolerance.")
+
   parser.add_argument(
       "--max_iter",
       "-m",
       type=int,
-      default=20,
+      default=DEFAULTS["max_iter"],
       help="Maximum Newton iterations before divergence is declared.")
+
   parser.add_argument("--y",
                       "-y",
                       type=float,
-                      default=0.6,
+                      default=DEFAULTS["y"],
                       help="Initial guess for y (y-coordinate).")
+
   parser.add_argument("--x",
                       "-x",
                       type=float,
-                      default=0.6,
+                      default=DEFAULTS["x"],
                       help="Initial guess for x (x-coordinate).")
 
   # Here we add predictor with a default of True, but allow disabling it
   group = parser.add_mutually_exclusive_group()
+
   group.add_argument(
       "--predictor",
       "-p",
       dest="predictor",
       action="store_true",
-      default=True,
+      default=DEFAULTS["predictor"],
       help=
       "Use a predictor step that improves the initial guess of every continuation step with only one extra solve step (usually a back substitution, but here the 2x2 matrix is inverted analytically)."
   )
+
   group.add_argument("--no-predictor",
                      dest="predictor",
                      action="store_false",

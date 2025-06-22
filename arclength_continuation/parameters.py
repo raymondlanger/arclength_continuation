@@ -22,6 +22,17 @@
 
 from dataclasses import dataclass
 
+DEFAULTS = {
+    "delta_s": 0.2,
+    "n_continuation": 30,
+    "tol": 1.0e-08,
+    "max_iter": 20,
+    "y": 0.6,
+    "x": 0.6,
+    "predictor": True
+}
+
+
 @dataclass
 class ContinuationParameters:
   """
@@ -35,11 +46,23 @@ class ContinuationParameters:
       max_iter: Maximum iterations for Newton's method
       predictor: Whether to use a predictor step in continuation
   """
-  delta_s: float
-  n_continuation: int
-  tol: float
-  max_iter: int
-  predictor: bool
+  delta_s: float = DEFAULTS["delta_s"]
+  n_continuation: int = DEFAULTS["n_continuation"]
+  tol: float = DEFAULTS["tol"]
+  max_iter: int = DEFAULTS["max_iter"]
+  predictor: bool = DEFAULTS["predictor"]
+
+  @classmethod
+  def from_args(cls, args):
+    return cls(delta_s=args.delta_s
+               if args.delta_s is not None else DEFAULTS['delta_s'],
+               n_continuation=args.n_continuation if args.n_continuation
+               is not None else DEFAULTS['n_continuation'],
+               tol=args.tol if args.tol is not None else DEFAULTS['tol'],
+               max_iter=args.max_iter
+               if args.max_iter is not None else DEFAULTS['max_iter'],
+               predictor=args.predictor
+               if args.predictor is not None else DEFAULTS['predictor'])
 
   def __str__(self) -> str:
     return ("ContinuationParameters:\n"
