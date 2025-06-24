@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arclength_continuation"
+dynamic = ["version"]
+description = "Python script that demonstrates how to use pseudo-arclength continuation."
+readme = {file = "README.md", content-type = "text/markdown"}
+dependencies = [ "numpy>=1.20", "matplotlib>=3.4" ]
+requires-python = ">=3.7"
+keywords = ["math", "continuation", "numerical methods"]
+license = "MIT"
+license-files = [
+    "LICENSE",
+]
+authors = [{name = "Raymond Langer", email = "raymond.langer@gmx.net"}]
+classifiers=[
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Science/Research',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python :: 3',
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    ]
+
+[project.scripts]
+arclength_continuation = "arclength_continuation.__main__:main"
+
+[project.urls]
+homepage = "https://github.com/raymondlanger/arclength_continuation"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.dynamic]
+version = {attr = "arclength_continuation.__version__"}
