@@ -7,7 +7,7 @@ name = "arclength_continuation"
 dynamic = ["version"]
 description = "Python script that demonstrates how to use pseudo-arclength continuation."
 readme = {file = "README.md", content-type = "text/markdown"}
-dependencies = [ "numpy>=1.20", "matplotlib>=3.4" ]
+dependencies = [ "numpy>=1.21", "matplotlib>=3.4" ]
 requires-python = ">=3.7"
 keywords = ["math", "continuation", "numerical methods"]
 license = "MIT"
