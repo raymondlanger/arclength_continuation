@@ -52,7 +52,9 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
 
   publish-to-testpypi:
-    name: Publish the arclength continuation example to TestPyPI
+    name: >-
+      Publish the arclength continuation example to TestPyPI
+    if: startsWith(github.ref, 'refs/tags/')  # only publish to TestPyPI on tag pushes
     needs:
     - build
     runs-on: ubuntu-latest
