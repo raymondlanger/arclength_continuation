@@ -17,6 +17,6 @@ pip install arclength-continuation
 ## Usage
 
 ```console
-python arclength_continuation.py -d -0.2 -n 30 -t 1e-9 --no-predictor
+arclength_continuation -d -0.2 -n 30 -t 1e-9 --no-predictor
 ```
 
