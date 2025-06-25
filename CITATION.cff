@@ -5,7 +5,7 @@ authors:
   given-names: "Raymond"
   orcid: "https://orcid.org/0000-0001-7309-4544"
 title: "raymondlanger/arclength_continuation: A Pseudo-Arclength Continuation Example"
-version: v0.1.6
+version: v0.1.7
 doi: 10.5281/zenodo.15733515
 date-released: 2025-06-25
 url: "https://github.com/raymondlanger/arclength_continuation"
